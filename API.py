@@ -1,12 +1,9 @@
 from flask import Flask, request, render_template, jsonify
+from werkzeug.utils import secure_filename
 from model import model
 
 app = Flask(__name__)
 
-# Set the upload folder
-# UPLOAD_FOLDER = './files'
-# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/ai', methods=["GET", "POST"])
 def home():
@@ -18,6 +15,7 @@ def home():
 
     desc = request.form.get("desc")
     file = request.files.get("file")
+    file.filename = secure_filename(file.filename) + ".txt"
     principles = request.form.getlist("principles")
 
     if file:
