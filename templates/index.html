@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Upload a File</title>
+</head>
+<body>
+    <!-- Siple form to submit values -->
+    <h1>Upload a File</h1>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="text" name="ProjectDes">
+        <input type="text" name="PandG">
+        <input type="submit">
+    </form>
+    <!-- {% if not response %}
+    <span style="display: block; height: 130px"></span>
+    {% endif %}
+    {% if response %}
+    <p class="predicted-word">response : {{response}}</p>
+    {% elif error %}
+    <p class="error">Please Enter a valid Input</p>
+    {% endif %} -->
+</body>
+</html>
