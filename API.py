@@ -1,7 +1,5 @@
-from langchain_community.llms import Ollama
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, request, render_template, jsonify
 from model import model
-import os
 
 app = Flask(__name__)
 
@@ -10,34 +8,33 @@ app = Flask(__name__)
 # os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/ai',methods= ["GET","POST"])
+@app.route('/ai', methods=["GET", "POST"])
 def home():
-    # Rendering index.html
     if request.method == "GET":
         return render_template('index.html')
-    
+
     if request.method == "POST":
-        print('ai post called')
+        print('AI POST called')
 
-        # Getting data
-        json_content=request.json
-        desc = json_content.get("desc")
-        file_path = json_content.get("file_path")
-        principles = json_content.get("principles")
+    desc = request.form.get("desc")
+    file = request.files.get("file")
+    principles = request.form.getlist("principles")
 
-        # Giving values to model
-        response = model(file_path,desc,principles)
+    if file:
+        file_path = f"files/{file.filename}"
+        file.save(file_path)
 
-        # Response into Object
-        response_answer={"answer":response}
+        response = model(file_path, desc, principles)
 
-        # Returning response
-        return response_answer
+        response_answer = {"answer": response}
+
+        return jsonify(response_answer)
+    return jsonify("Model response error")
 
 
 def start_app():
-    app.run(host="0.0.0.0",port=8080,debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     start_app()
-    
