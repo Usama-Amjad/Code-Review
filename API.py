@@ -1,9 +1,14 @@
 from flask import Flask, request, render_template, jsonify
 from werkzeug.utils import secure_filename
 from model import model
+import os
 
 app = Flask(__name__)
 
+# Set the upload folder
+UPLOAD_FOLDER = './files'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/ai', methods=["GET", "POST"])
 def home():
@@ -14,19 +19,24 @@ def home():
         print('AI POST called')
 
     desc = request.form.get("desc")
+    
     file = request.files.get("file")
-    file.filename = secure_filename(file.filename) + ".txt"
+
+    # Checking if the file is a python file
+    if file.filename[-2:] == 'py':
+        name = file.filename.split('.')[0]
+        file.filename = name + '.txt'
+    
     principles = request.form.getlist("principles")
 
     if file:
-        file_path = f"files/{file.filename}"
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
 
         response = model(file_path, desc, principles)
 
-        response_answer = {"answer": response}
-
-        return jsonify(response_answer)
+        return render_template('index.html',answer=response,error=True if response==None else False)
+    
     return jsonify("Model response error")
 
 
